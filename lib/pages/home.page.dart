@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:newnoticias/models/articulo.model.dart';
 import 'package:newnoticias/providers/articulos.provider.dart';
+
+import '../widgets/card.widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -10,11 +13,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  ArticuloProvider articuloProvider = ArticuloProvider();
+  final articuloProvider = ArticuloProvider();
+  late Future<List<ArticuloModel>> articulos;
 
   @override
   void initState() {
-    var respuesta = articuloProvider.obtenerArticulos();
+    articulos = articuloProvider.obtenerArticulos();
     super.initState();
   }
 
@@ -22,7 +26,22 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title:Text("Noticias")),
-      //body: ,
+      body: FutureBuilder(
+        future: articulos,
+        builder: ((context, snapshot){
+          List<Widget> lista = [];
+
+          if(snapshot.hasData){
+            snapshot.data?.forEach((element) => lista.add(Cardwidget(articulo : element)));
+          return ListView(
+            children: lista,
+          );
+          }else{
+            return CircularProgressIndicator();
+          }
+          
+        }),
+      )
     );
   }
 }
